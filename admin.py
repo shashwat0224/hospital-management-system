@@ -41,6 +41,8 @@ def show_admin_dashboard():
 
                     messagebox.showinfo("Success", "Staff added successfully.")
                     staff_add_window.destroy()
+                    back(manage_staff)
+
                 else:
                     messagebox.showerror("Error", "Please fill in all required fields.")
                     return
@@ -284,7 +286,7 @@ def show_admin_dashboard():
             name_label = tk.Label(add_patient_window, text="Name:")
             name_label.pack()
             name_entry = tk.Entry(add_patient_window)
-            name_entry.pack()
+            name_entry.pack(expand=True)
 
             age_label = tk.Label(add_patient_window, text="Age:")
             age_label.pack()
@@ -294,39 +296,60 @@ def show_admin_dashboard():
             #make dropdown with values Male, Female, Other
             sex_label = tk.Label(add_patient_window, text="Sex:")
             sex_label.pack()
-            sex_entry = tk.Entry(add_patient_window)
+            sex_entry = tk.Combobox(add_patient_window)
+            sex_entry["values"] = ("Male", "Female", "Other")
+            sex_entry.pack()
+
+             # Create labels and entry fields for patient details
+            name_label = ttk.Label(add_patient_window, text="Name:")
+            name_label.pack()
+            name_entry = ttk.Entry(add_patient_window)
+            name_entry.pack(expand=True)
+
+            age_label = ttk.Label(add_patient_window, text="Age:")
+            age_label.pack()
+            age_entry = ttk.Entry(add_patient_window)
+            age_entry.pack()
+
+            #make dropdown with values Male, Female, Other
+            sex_label = ttk.Label(add_patient_window, text="Sex:")
+            sex_label.pack()
+            sex_entry = ttk.Combobox(add_patient_window)
+            sex_entry["values"] = ("Male", "Female", "Other")
             sex_entry.pack()
 
             # make dropdown with values A+, B+, O+, AB+, A-, B-, O-, AB-
             blood_group_label = tk.Label(add_patient_window, text="Blood Group:")
             blood_group_label.pack()
-            blood_group_entry = tk.Entry(add_patient_window)
+            blood_group_entry = ttk.Combobox(add_patient_window)
+            blood_group_entry['values'] = ("A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-")
             blood_group_entry.pack()
 
-            email_label = tk.Label(add_patient_window, text="Email:")
+            email_label = ttk.Label(add_patient_window, text="Email:")
             email_label.pack()
-            email_entry = tk.Entry(add_patient_window)
-            email_entry.pack()
+            email_entry = ttk.Entry(add_patient_window)
+            email_entry.pack(expand=True)
 
-            contact_label = tk.Label(add_patient_window, text="Contact:")
+            contact_label = ttk.Label(add_patient_window, text="Contact:")
             contact_label.pack()
-            contact_entry = tk.Entry(add_patient_window)
+            contact_entry = ttk.Entry(add_patient_window)
             contact_entry.pack()
 
-            address_label = tk.Label(add_patient_window, text="Address:")
+            address_label = ttk.Label(add_patient_window, text="Address:")
             address_label.pack()
-            address_entry = tk.Entry(add_patient_window)
-            address_entry.pack()
+            address_entry = ttk.Entry(add_patient_window)
+            address_entry.pack(expand=True)
 
-            illness_injury_label = tk.Label(add_patient_window, text="Illness/Injury:")
+            illness_injury_label = ttk.Label(add_patient_window, text="Illness/Injury:")
             illness_injury_label.pack()
-            illness_injury_entry = tk.Entry(add_patient_window)
-            illness_injury_entry.pack()
+            illness_injury_entry = ttk.Entry(add_patient_window)
+            illness_injury_entry.pack(expand=True)
 
             # dropdown with values inpatient, outpatient
             status_label = tk.Label(add_patient_window, text="Status:")
             status_label.pack()
-            status_entry = tk.Entry(add_patient_window)
+            status_entry = ttk.Combobox(add_patient_window)
+            status_entry['values'] = ("inpatient", "outpatient")
             status_entry.pack()
 
             add_button = tk.Button(add_patient_window, text="Add", command=insert_patient)
@@ -440,7 +463,7 @@ def show_admin_dashboard():
             email_label = tk.Label(update_window, text="Email:")
             email_label.pack()
             email_entry = tk.Entry(update_window)
-            email_entry.pack()
+            email_entry.pack(expand=True)
 
             contact_label = tk.Label(update_window, text="Contact:")
             contact_label.pack()
@@ -450,12 +473,12 @@ def show_admin_dashboard():
             address_label = tk.Label(update_window, text="Address:")
             address_label.pack()
             address_entry = tk.Entry(update_window)
-            address_entry.pack()
+            address_entry.pack(expand=True)
 
             illness_injury_label = tk.Label(update_window, text="Illness/Injury:")
             illness_injury_label.pack()
             illness_injury_entry = tk.Entry(update_window)
-            illness_injury_entry.pack()
+            illness_injury_entry.pack(expand=True)
 
             # make dropdown with values -> inpatient and outpatient
             status_label = tk.Label(update_window, text="Status:")
@@ -777,27 +800,21 @@ def show_admin_dashboard():
         def send_notification(patient_id, appointment_date, appointment_time):
             # Fetch patient's email from the database
             cursor.execute("SELECT email FROM patient WHERE id = %s", (patient_id,))
-            patient_email = cursor.fetchone()[0]  # Replace [0] with the appropriate index based on your database structure
-
+            patient_email = cursor.fetchone()[0]  
+            
             # Email configuration
-            sender_email = 'appointments.cityhospital@gmail.com'  # Replace with your email
-            password = 'kyakaregajankar'  # Replace with your password
-
-            msg = EmailMessage()
-            msg['Subject'] = 'Appointment Confirmation'
-            msg['From'] = sender_email
-            msg['To'] = patient_email
-            msg.set_content(f"Dear {patient_id},\n\nYour appointment has been scheduled for {appointment_date} at {appointment_time}.\n\nRegards,\nHospital Management")
-
-            try:
-                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                    smtp.login(sender_email, password)
-                    smtp.send_message(msg)
-                messagebox.showinfo("Notification", "Notification email sent successfully.")
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to send notification email: {str(e)}")
-                return
-
+            sender_email = 'appointments.cityhospital@gmail.com'  
+            password = 'llqi cfwt smqu eodp'  
+            subject = 'Appointment Confirmation'
+            cursor.execute("SELECT name FROM patient WHERE id = %s", (patient_id,))
+            patient_name = cursor.fetchone()[0]
+            body = f"Subject: {subject}\n\nDear {patient_name},\n\nYour appointment has been scheduled for {appointment_date} at {appointment_time}.\n\nRegards,\nHospital Management"
+            s = smtplib.SMTP('smtp.gmail.com', 587)
+            s.starttls() #Puts connection to smtp server in Tls mode
+            s.login(sender_email, password)
+            s.sendmail(sender_email, patient_email, body)
+            s.quit()
+        
         appointment_schedule_window = tk.Toplevel()
         appointment_schedule_window.title("Appointment Scheduling and Notifications")
 

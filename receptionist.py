@@ -1,8 +1,11 @@
+from tkcalendar import DateEntry
+from datetime import datetime
 import tkinter as tk
 from tkinter import messagebox, ttk
 from database import cursor, mysql
 import smtplib
-from test import send_email
+# from test import get_selected_date
+
 
 def show_receptionist_dashboard():
     def return_to_main_menu(window_to_close):
@@ -141,6 +144,13 @@ def show_receptionist_dashboard():
 
     def appointment_scheduling(parent_window):
         '''Functionality for scheduling patient appointments with doctors'''
+        
+        available_time_slots = [
+            "09:00 AM", "10:00 AM", "11:00 AM",
+            "01:00 PM", "02:00 PM", "03:00 PM",
+            "04:00 PM", "05:00 PM", "06:00 PM"
+        ]
+
         def back(window_to_close):
             window_to_close.destroy()
             admit_discharge_management(parent_window)
@@ -153,6 +163,8 @@ def show_receptionist_dashboard():
                 doctor_id = doctor_id_entry.get()
                 appointment_date = appointment_date_entry.get()
                 appointment_time = appointment_time_entry.get()
+
+                
                 # Check if the patient exists
                 cursor.execute("SELECT * FROM patient WHERE id = %s", (patient_id,))
                 patient = cursor.fetchone()
@@ -185,8 +197,42 @@ def show_receptionist_dashboard():
                         send_notification(patient_id, appointment_date, appointment_time)
                         messagebox.showinfo("Success", "Appointment scheduled successfully.")
                         appointment_window.destroy()
-                        admit_discharge_management(parent_window)
+                        appointment_scheduling(parent_window)
 
+            def date_check(event):
+                appointment_date = appointment_date_entry.get()
+                current_date = datetime.now().date()
+                # print(current_date)
+                if appointment_date < current_date:
+                    messagebox.showerror("Error", "Please select a future date for the appointment.")
+                    return
+
+            def get_selected_time(selected_date):
+                def on_time_select():
+                    selected_time = time_combobox.get()
+                    if selected_time in available_time_slots:
+                        appointment_time_entry.insert(0,time_combobox.get())
+                        available_time_slots.remove(selected_time)
+                        time_combobox['values'] = available_time_slots
+                        time_combobox.set((available_time_slots[0]) if available_time_slots else None)
+                        top.destroy()
+                        appointment_time_entry.config(state="readonly")
+                    else:
+                        messagebox.showwarning("Warning", "Please select an available time slot.")
+
+                top = tk.Toplevel(appointment_window)
+                top.title("Time Selection")
+
+                time_label = ttk.Label(top, text="Select Time:")
+                time_label.pack(pady=10)
+
+                time_combobox = ttk.Combobox(top, values=available_time_slots, state="readonly")
+                time_combobox.pack(pady=10)
+                time_combobox.set(available_time_slots[0]) if available_time_slots else None
+
+                select_button = ttk.Button(top, text="Select Time", command=on_time_select)
+                select_button.pack(pady=10)
+                    
             appointment_window = tk.Toplevel()
             appointment_window.title("Schedule Appointment")
 
@@ -204,13 +250,16 @@ def show_receptionist_dashboard():
             # see a way to get date and time like using a calendar
             appointment_date_label = tk.Label(appointment_window, text="Appointment Date:")
             appointment_date_label.pack()
-            appointment_date_entry = tk.Entry(appointment_window)
+            appointment_date_entry = DateEntry(appointment_window) #not working properly
             appointment_date_entry.pack()
+            appointment_date_entry.bind("<Button-1>", lambda event: date_check(event))
+
 
             appointment_time_label = tk.Label(appointment_window, text="Appointment Time:")
             appointment_time_label.pack()
             appointment_time_entry = tk.Entry(appointment_window)
             appointment_time_entry.pack()
+            appointment_time_entry.bind("<Button-1>", lambda event: get_selected_time(appointment_date_entry.get()))
 
             confirm_button = tk.Button(appointment_window, text="Confirm Appointment", command=confirm_appointment)
             confirm_button.pack()
@@ -292,58 +341,61 @@ def show_receptionist_dashboard():
             add_patient_window.title("Add New Patient")
 
             # Create labels and entry fields for patient details
-            name_label = tk.Label(add_patient_window, text="Name:")
+            name_label = ttk.Label(add_patient_window, text="Name:")
             name_label.pack()
-            name_entry = tk.Entry(add_patient_window)
+            name_entry = ttk.Entry(add_patient_window)
             name_entry.pack(expand=True)
 
-            age_label = tk.Label(add_patient_window, text="Age:")
+            age_label = ttk.Label(add_patient_window, text="Age:")
             age_label.pack()
-            age_entry = tk.Entry(add_patient_window)
+            age_entry = ttk.Entry(add_patient_window)
             age_entry.pack()
 
             #make dropdown with values Male, Female, Other
-            sex_label = tk.Label(add_patient_window, text="Sex:")
+            sex_label = ttk.Label(add_patient_window, text="Sex:")
             sex_label.pack()
-            sex_entry = tk.Entry(add_patient_window)
+            sex_entry = ttk.Combobox(add_patient_window)
+            sex_entry["values"] = ("Male", "Female", "Other")
             sex_entry.pack()
 
             # make dropdown with values A+, B+, O+, AB+, A-, B-, O-, AB-
             blood_group_label = tk.Label(add_patient_window, text="Blood Group:")
             blood_group_label.pack()
-            blood_group_entry = tk.Entry(add_patient_window)
+            blood_group_entry = ttk.Combobox(add_patient_window)
+            blood_group_entry['values'] = ("A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-")
             blood_group_entry.pack()
 
-            email_label = tk.Label(add_patient_window, text="Email:")
+            email_label = ttk.Label(add_patient_window, text="Email:")
             email_label.pack()
-            email_entry = tk.Entry(add_patient_window)
+            email_entry = ttk.Entry(add_patient_window)
             email_entry.pack(expand=True)
 
-            contact_label = tk.Label(add_patient_window, text="Contact:")
+            contact_label = ttk.Label(add_patient_window, text="Contact:")
             contact_label.pack()
-            contact_entry = tk.Entry(add_patient_window)
+            contact_entry = ttk.Entry(add_patient_window)
             contact_entry.pack()
 
-            address_label = tk.Label(add_patient_window, text="Address:")
+            address_label = ttk.Label(add_patient_window, text="Address:")
             address_label.pack()
-            address_entry = tk.Entry(add_patient_window)
+            address_entry = ttk.Entry(add_patient_window)
             address_entry.pack(expand=True)
 
-            illness_injury_label = tk.Label(add_patient_window, text="Illness/Injury:")
+            illness_injury_label = ttk.Label(add_patient_window, text="Illness/Injury:")
             illness_injury_label.pack()
-            illness_injury_entry = tk.Entry(add_patient_window)
+            illness_injury_entry = ttk.Entry(add_patient_window)
             illness_injury_entry.pack(expand=True)
 
             # dropdown with values inpatient, outpatient
             status_label = tk.Label(add_patient_window, text="Status:")
             status_label.pack()
-            status_entry = tk.Entry(add_patient_window)
+            status_entry = ttk.Combobox(add_patient_window)
+            status_entry['values'] = ("inpatient", "outpatient")
             status_entry.pack()
 
-            add_button = tk.Button(add_patient_window, text="Add", command=insert_patient)
+            add_button = ttk.Button(add_patient_window, text="Add", command=insert_patient)
             add_button.pack()
 
-            back_button = tk.Button(add_patient_window, text="Back", command=lambda: back(add_patient_window))
+            back_button = ttk.Button(add_patient_window, text="Back", command=lambda: back(add_patient_window))
             back_button.pack()
 
         def view_patients():

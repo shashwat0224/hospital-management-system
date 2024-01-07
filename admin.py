@@ -2,16 +2,11 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import matplotlib.pyplot as plt
 import smtplib
-from email.message import EmailMessage
+from datetime import datetime
 from database import cursor, mysql
+from tkcalendar import Calendar
 
-'''
- in add_patients and update patients need to use combobox for sex,bloodgroup,etc.
-'''
 
-'''
- have to change
-'''
 def show_admin_dashboard():
     def return_to_main_menu(window_to_close):
         window_to_close.destroy()
@@ -375,9 +370,11 @@ def show_admin_dashboard():
             admitted_label.pack()
 
             admitted_columns = ("ID", "Name", "Age", "Sex", "Blood Group", "Admit Date", "Discharged Date")
-            admitted_treeview = ttk.Treeview(admitted_frame, columns=admitted_columns, show="headings")
+            admitted_treeview = ttk.Treeview(admitted_frame, columns=admitted_columns, show="tree")
             for col in admitted_columns:
                 admitted_treeview.heading(col, text=col)
+            for col in admitted_columns:
+                admitted_treeview.column(col, anchor="center")
             admitted_treeview.pack()
 
             all_patients_frame = tk.Frame(view_patients_window)
@@ -540,7 +537,6 @@ def show_admin_dashboard():
         feature_window.mainloop()
 
     def analytics_reports():
-        admin_dashboard.withdraw()
         # Fetch data from the database (For example: Number of patients in different age groups)
         cursor.execute("SELECT Age, COUNT(*) FROM patient GROUP BY Age")
         data = cursor.fetchall()
@@ -587,7 +583,7 @@ def show_admin_dashboard():
             view_window.title("View Doctor Information")
 
             # Create a Treeview widget to display doctor information in a table
-            tree = ttk.Treeview(view_window, columns=("ID", "Name", "Specialization", "Fees", "Contact", "Address", "Email"))
+            tree = ttk.Treeview(view_window, columns=("ID", "Name", "Specialization", "Fees", "Contact", "Address", "Email"), show="tree")
             tree.heading("#0", text="Index")
             tree.heading("ID", text="ID")
             tree.heading("Name", text="Name")
@@ -597,14 +593,14 @@ def show_admin_dashboard():
             tree.heading("Address", text="Address")
             tree.heading("Email", text="Email")
 
-            tree.column("#0", width=50)
-            tree.column("ID", width=50)
-            tree.column("Name", width=100)
-            tree.column("Specialization", width=150)
-            tree.column("Fees", width=100)
-            tree.column("Contact", width=100)
-            tree.column("Address", width=200)
-            tree.column("Email", width=150)
+            tree.column("#0", width=50, anchor="center")
+            tree.column("ID", width=50, anchor="center")
+            tree.column("Name", width=100, anchor="center")
+            tree.column("Specialization", width=150, anchor="center")
+            tree.column("Fees", width=100, anchor="center")
+            tree.column("Contact", width=100, anchor="center")
+            tree.column("Address", width=200, anchor="center")
+            tree.column("Email", width=150, anchor="center")
 
             tree.pack(expand=True, fill=tk.BOTH)
 
@@ -723,6 +719,38 @@ def show_admin_dashboard():
         def back(window_to_close):
             window_to_close.destroy()
             appointment_scheduling_notifications(parent_window)
+        def show_appointments():
+            appointment_scheduling_notifications.withdraw()
+            appointments_window = tk.Tk()
+            appointments_window.title("Appointments")
+
+            all_appointments = tk.Frame(appointments_window)
+            all_appointments.pack()
+            
+            all_appointments_label = tk.Label(all_appointments, text="All Appointments")
+            all_appointments_label.pack()
+
+            tree = ttk.Treeview(all_appointments, show="headings" )
+            tree["columns"] = ("Patient ID", "Doctor ID", "Appointment Date", "Appointment Time")
+
+            tree.heading("Patient ID", text="Patient ID")
+            tree.heading("Doctor ID", text="Doctor ID")
+            tree.heading("Appointment Date", text="Appointment Date")
+            tree.heading("Appointment Time", text="Appointment Time")
+            # Fetch appointments data from the appointments table
+            cursor.execute("SELECT * FROM appointments")
+            appointments_data = cursor.fetchall()
+            for appointment in appointments_data:
+                tree.insert("", tk.END, values=(appointment[1], appointment[2], appointment[3], appointment[4]))
+            # Adjusting column widths
+            for col in ("Patient ID", "Doctor ID", "Appointment Date", "Appointment Time"):
+                tree.column(col, anchor="center")
+            tree.pack()
+
+            # appointments_window.mainloop()
+            
+            back_button = tk.Button(all_appointments, text="Back", command=lambda: back(all_appointments))
+            back_button.pack()
         def schedule_appointment():
             appointment_schedule_window.withdraw()
             def check_schedule():
@@ -765,6 +793,58 @@ def show_admin_dashboard():
                         send_notification(patient_id, appointment_date, appointment_time)
                         schedule_window.destroy()
 
+            def get_selected_date():
+                def on_date_select():
+                    selected_date = cal.get_date()
+                    today = datetime.now().date()
+                    selected_date = datetime.strptime(selected_date, "%m/%d/%Y").date()  # Updated date format
+
+                    if selected_date < today:
+                        messagebox.showwarning("Warning", "Please select a date from today onwards.")
+                    else:
+                        appointment_date_entry.delete(0, tk.END)
+                        appointment_date_entry.insert(0, selected_date)  # Updated date format
+                        top.destroy()
+
+                top = tk.Toplevel(schedule_window)
+                cal = Calendar(top, selectmode="day", date_pattern="m/d/Y")  # Updated date format
+                cal.pack(padx=20, pady=20)
+
+                select_button = ttk.Button(top, text="Select Date", command=on_date_select)
+                select_button.pack(pady=10)
+
+            available_time_slots = [
+                "09:00 AM", "10:00 AM", "11:00 AM",
+                "01:00 PM", "02:00 PM", "03:00 PM",
+                "04:00 PM", "05:00 PM", "06:00 PM"
+            ]
+            
+            def get_selected_time(selected_date):
+                def on_time_select():
+                    selected_time = time_combobox.get()
+                    if selected_time in available_time_slots:
+                        appointment_time_entry.insert(0,time_combobox.get())
+                        available_time_slots.remove(selected_time)
+                        time_combobox['values'] = available_time_slots
+                        time_combobox.set((available_time_slots[0]) if available_time_slots else None)
+                        top.destroy()
+                        appointment_time_entry.config(state="readonly")
+                    else:
+                        messagebox.showwarning("Warning", "Please select an available time slot.")
+
+                top = tk.Toplevel(schedule_window)
+                top.title("Time Selection")
+
+                time_label = ttk.Label(top, text="Select Time:")
+                time_label.pack(pady=10)
+
+                time_combobox = ttk.Combobox(top, values=available_time_slots, state="readonly")
+                time_combobox.pack(pady=10)
+                time_combobox.set(available_time_slots[0]) if available_time_slots else None
+
+                select_button = ttk.Button(top, text="Select Time", command=on_time_select)
+                select_button.pack(pady=10)
+
             schedule_window = tk.Toplevel()
             schedule_window.title("Schedule Appointment")
 
@@ -783,11 +863,14 @@ def show_admin_dashboard():
             appointment_date_label.pack()
             appointment_date_entry = tk.Entry(schedule_window)
             appointment_date_entry.pack()
+            appointment_date_entry.bind("<Button-1>", lambda event: get_selected_date())
+
 
             appointment_time_label = tk.Label(schedule_window, text="Appointment Time (HH:MM AM/PM):")
             appointment_time_label.pack()
             appointment_time_entry = tk.Entry(schedule_window)
             appointment_time_entry.pack()
+            appointment_time_entry.bind("<Button-1>", lambda event: get_selected_time(appointment_date_entry.get()))
 
             schedule_button = tk.Button(schedule_window, text="Schedule", command=check_schedule)
             schedule_button.pack()
@@ -820,6 +903,9 @@ def show_admin_dashboard():
 
         schedule_appointment_button = tk.Button(appointment_schedule_window, text="Schedule Appointment", command=schedule_appointment)
         schedule_appointment_button.pack()
+
+        show_appointments_button = tk.Button(appointment_schedule_window, text="Show All Appointments", command=show_appointments)
+        show_appointments_button.pack()
 
         return_button = tk.Button(appointment_schedule_window, text="Back to Main Menu", command=lambda: return_to_main_menu(appointment_schedule_window))
         return_button.pack()

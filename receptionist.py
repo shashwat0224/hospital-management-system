@@ -1,4 +1,4 @@
-from tkcalendar import DateEntry
+from tkcalendar import Calendar
 from datetime import datetime
 import tkinter as tk
 from tkinter import messagebox, ttk
@@ -58,6 +58,7 @@ def show_receptionist_dashboard():
 
             patient_admit_window = tk.Toplevel()
             patient_admit_window.title("Admit Patient")
+            patient_admit_window.geometry("300X200+500+250")
 
             # Create labels and entry fields for patient details
             name_label = tk.Label(patient_admit_window, text="Name:")
@@ -116,6 +117,7 @@ def show_receptionist_dashboard():
 
             patient_discharge_window = tk.Toplevel()
             patient_discharge_window.title("Discharge Patient")
+            patient_discharge_window.geometry("100x100+500+250")
 
             # Create an entry field to input patient ID for discharge
             patient_id_label = tk.Label(patient_discharge_window, text="Patient ID:")
@@ -132,6 +134,7 @@ def show_receptionist_dashboard():
 
         feature_window = tk.Toplevel()
         feature_window.title("Admit/Discharge Management")
+        feature_window.geometry("100x100+500+250")
 
         admit_button = tk.Button(feature_window, text="Admit Patient", command=admit_patient)
         admit_button.pack()
@@ -144,6 +147,7 @@ def show_receptionist_dashboard():
 
     def appointment_scheduling(parent_window):
         '''Functionality for scheduling patient appointments with doctors'''
+        receptionist_dashboard.withdraw()
         
         available_time_slots = [
             "09:00 AM", "10:00 AM", "11:00 AM",
@@ -153,8 +157,42 @@ def show_receptionist_dashboard():
 
         def back(window_to_close):
             window_to_close.destroy()
-            admit_discharge_management(parent_window)
-        receptionist_dashboard.withdraw()
+            appointment_scheduling(parent_window)
+        
+
+        def show_appointments():
+            feature_window.withdraw()
+            appointments_window = tk.Tk()
+            appointments_window.title("Appointments")
+
+            all_appointments = tk.Frame(appointments_window)
+            all_appointments.pack()
+            
+            all_appointments_label = tk.Label(all_appointments, text="All Appointments")
+            all_appointments_label.pack()
+
+            tree = ttk.Treeview(all_appointments, show="headings" )
+            tree["columns"] = ("Patient ID", "Doctor ID", "Appointment Date", "Appointment Time")
+
+            tree.heading("Patient ID", text="Patient ID")
+            tree.heading("Doctor ID", text="Doctor ID")
+            tree.heading("Appointment Date", text="Appointment Date")
+            tree.heading("Appointment Time", text="Appointment Time")
+            # Fetch appointments data from the appointments table
+            cursor.execute("SELECT * FROM appointments")
+            appointments_data = cursor.fetchall()
+            for appointment in appointments_data:
+                tree.insert("", tk.END, values=(appointment[1], appointment[2], appointment[3], appointment[4]))
+            # Adjusting column widths
+            for col in ("Patient ID", "Doctor ID", "Appointment Date", "Appointment Time"):
+                tree.column(col, anchor="center")
+            tree.pack()
+
+            # appointments_window.mainloop()
+            
+            back_button = tk.Button(appointments_window, text="Back", command=lambda: back(appointments_window))
+            back_button.pack()
+
         def schedule_appointment():
             feature_window.withdraw()
             '''Functionality for scheduling an appointment'''
@@ -198,26 +236,26 @@ def show_receptionist_dashboard():
                         messagebox.showinfo("Success", "Appointment scheduled successfully.")
                         appointment_window.destroy()
                         appointment_scheduling(parent_window)
-                        
-             def date_check(app_date):
-                app_date_ = app_date.split("/")[1]
-                app_month = app_date.split("/")[0]
-                app_year = app_date.split("/")[2]
-                current_date = str(datetime.now().date())
-                current_date_ = current_date.split("-")[2]
-                current_month = current_date.split("-")[1]
-                current_year = current_date.split("-")[0]
-
-                if app_date_ < current_date_ or app_month < current_month or app_year < current_year :
-                    messagebox.showerror("Error", "Enter date has already passed.")
                     
-            # def date_check(event):
-            #     appointment_date = appointment_date_entry.get()
-            #     current_date = datetime.now().date()
-            #     # print(current_date)
-            #     if appointment_date < current_date:
-            #         messagebox.showerror("Error", "Please select a future date for the appointment.")
-            #         return
+            def get_selected_date():
+                def on_date_select():
+                    selected_date = cal.get_date()
+                    today = datetime.now().date()
+                    selected_date = datetime.strptime(selected_date, "%m/%d/%Y").date()  # Updated date format
+
+                    if selected_date < today:
+                        messagebox.showwarning("Warning", "Please select a date from today onwards.")
+                    else:
+                        appointment_date_entry.delete(0, tk.END)
+                        appointment_date_entry.insert(0, selected_date)  # Updated date format
+                        top.destroy()
+
+                top = tk.Toplevel(appointment_window)
+                cal = Calendar(top, selectmode="day", date_pattern="m/d/Y")  # Updated date format
+                cal.pack(padx=20, pady=20)
+
+                select_button = ttk.Button(top, text="Select Date", command=on_date_select)
+                select_button.pack(pady=10)
 
             def get_selected_time(selected_date):
                 def on_time_select():
@@ -262,9 +300,9 @@ def show_receptionist_dashboard():
             # see a way to get date and time like using a calendar
             appointment_date_label = tk.Label(appointment_window, text="Appointment Date:")
             appointment_date_label.pack()
-            appointment_date_entry = DateEntry(appointment_window) #not working properly
+            appointment_date_entry = tk.Entry(appointment_window) 
             appointment_date_entry.pack()
-            appointment_date_entry.bind("<Button-1>", lambda event: date_check(event))
+            appointment_date_entry.bind("<Button-1>", lambda event: get_selected_date())
 
 
             appointment_time_label = tk.Label(appointment_window, text="Appointment Time:")
@@ -303,6 +341,9 @@ def show_receptionist_dashboard():
 
         schedule_button = tk.Button(feature_window, text="Schedule Appointment", command=schedule_appointment)
         schedule_button.pack()
+
+        show_appointments_button = tk.Button(feature_window, text="Show All Appointments", command=show_appointments)
+        show_appointments_button.pack()
 
         return_button = tk.Button(feature_window, text="Back to Main Menu", command=lambda: return_to_main_menu(feature_window))
         return_button.pack()
@@ -441,6 +482,8 @@ def show_receptionist_dashboard():
             all_patients_treeview = ttk.Treeview(all_patients_frame, columns=all_patients_columns, show="headings")
             for col in all_patients_columns:
                 all_patients_treeview.heading(col, text=col)
+            for col in admitted_columns:
+                admitted_treeview.column(col, anchor="center")
             all_patients_treeview.pack()
 
             # Retrieve admitted patients

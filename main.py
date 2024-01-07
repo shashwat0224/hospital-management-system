@@ -21,7 +21,6 @@ def authenticate():
     elif username == 'dummy' and password == 'dummy1234':
         root.destroy()
         show_receptionist_dashboard()
-    
     else:
         error_message = "Invalid username and/or password."
         show_error(error_message)
@@ -36,6 +35,7 @@ def show_error(text:str):
 # Create the main window
 root = tk.Tk()
 root.title("Hospital Management System")
+root.geometry("300x200+500+250")
 
 # Login Page
 login_frame = tk.Frame(root)

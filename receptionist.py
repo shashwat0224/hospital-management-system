@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from database import cursor, mysql
 import smtplib
+
+
 # from test import get_selected_date
 
 
@@ -15,18 +17,21 @@ def show_receptionist_dashboard():
     def admit_discharge_management(parent_window):
         '''Functionality for admitting and discharging patients'''
         receptionist_dashboard.withdraw()
+
         def back(window_to_close):
             window_to_close.destroy()
             admit_discharge_management(parent_window)
+
         def admit_patient():
             feature_window.withdraw()
             '''Functionality for admitting a patient'''
+
             def admit():
                 name = name_entry.get()
                 patient_id = patient_id_entry.get()
                 doctor_id = doctor_id_entry.get()
 
-                if not name and patient_id and doctor_id: 
+                if not name and patient_id and doctor_id:
                     error_message = f"Empty values"
                     messagebox.showerror("Error", error_message)
 
@@ -53,12 +58,13 @@ def show_receptionist_dashboard():
                 cursor.execute(query)
                 mysql.commit()
 
-                messagebox.showinfo("Success", f"Patient '{name}' admitted successfully under supervision of '{doctor[0]}'.")
+                messagebox.showinfo("Success",
+                                    f"Patient '{name}' admitted successfully under supervision of '{doctor[0]}'.")
                 patient_admit_window.destroy()
 
             patient_admit_window = tk.Toplevel()
             patient_admit_window.title("Admit Patient")
-            patient_admit_window.geometry("300X200+500+250")
+            patient_admit_window.geometry("300x200+500+250")
 
             # Create labels and entry fields for patient details
             name_label = tk.Label(patient_admit_window, text="Name:")
@@ -78,17 +84,18 @@ def show_receptionist_dashboard():
 
             admit_button = tk.Button(patient_admit_window, text="Admit", command=admit)
             admit_button.pack()
-            
+
             back_button = tk.Button(patient_admit_window, text="Back", command=lambda: back(patient_admit_window))
             back_button.pack()
 
         def discharge_patient():
             feature_window.withdraw()
+
             # Functionality for discharging a patient
             def discharge():
                 patient_id = patient_id_entry.get()
 
-                if not patient_id : 
+                if not patient_id:
                     error_message = f"Empty values"
                     messagebox.showerror("Error", error_message)
                     return
@@ -117,7 +124,7 @@ def show_receptionist_dashboard():
 
             patient_discharge_window = tk.Toplevel()
             patient_discharge_window.title("Discharge Patient")
-            patient_discharge_window.geometry("100x100+500+250")
+            patient_discharge_window.geometry("200x100+500+250")
 
             # Create an entry field to input patient ID for discharge
             patient_id_label = tk.Label(patient_discharge_window, text="Patient ID:")
@@ -127,10 +134,10 @@ def show_receptionist_dashboard():
 
             discharge_button = tk.Button(patient_discharge_window, text="Discharge", command=discharge)
             discharge_button.pack()
-            
-            back_button = tk.Button(patient_discharge_window, text="Back", command=lambda: back(patient_discharge_window))
-            back_button.pack()
 
+            back_button = tk.Button(patient_discharge_window, text="Back",
+                                    command=lambda: back(patient_discharge_window))
+            back_button.pack()
 
         feature_window = tk.Toplevel()
         feature_window.title("Admit/Discharge Management")
@@ -142,13 +149,14 @@ def show_receptionist_dashboard():
         discharge_button = tk.Button(feature_window, text="Discharge Patient", command=discharge_patient)
         discharge_button.pack()
 
-        return_button = tk.Button(feature_window, text="Back to Main Menu", command=lambda: return_to_main_menu(feature_window))
+        return_button = tk.Button(feature_window, text="Back to Main Menu",
+                                  command=lambda: return_to_main_menu(feature_window))
         return_button.pack()
 
     def appointment_scheduling(parent_window):
         '''Functionality for scheduling patient appointments with doctors'''
         receptionist_dashboard.withdraw()
-        
+
         available_time_slots = [
             "09:00 AM", "10:00 AM", "11:00 AM",
             "01:00 PM", "02:00 PM", "03:00 PM",
@@ -158,7 +166,6 @@ def show_receptionist_dashboard():
         def back(window_to_close):
             window_to_close.destroy()
             appointment_scheduling(parent_window)
-        
 
         def show_appointments():
             feature_window.withdraw()
@@ -167,11 +174,11 @@ def show_receptionist_dashboard():
 
             all_appointments = tk.Frame(appointments_window)
             all_appointments.pack()
-            
+
             all_appointments_label = tk.Label(all_appointments, text="All Appointments")
             all_appointments_label.pack()
 
-            tree = ttk.Treeview(all_appointments, show="headings" )
+            tree = ttk.Treeview(all_appointments, show="headings")
             tree["columns"] = ("Patient ID", "Doctor ID", "Appointment Date", "Appointment Time")
 
             tree.heading("Patient ID", text="Patient ID")
@@ -189,20 +196,20 @@ def show_receptionist_dashboard():
             tree.pack()
 
             # appointments_window.mainloop()
-            
+
             back_button = tk.Button(appointments_window, text="Back", command=lambda: back(appointments_window))
             back_button.pack()
 
         def schedule_appointment():
             feature_window.withdraw()
             '''Functionality for scheduling an appointment'''
+
             def confirm_appointment():
                 patient_id = patient_id_entry.get()
                 doctor_id = doctor_id_entry.get()
                 appointment_date = appointment_date_entry.get()
                 appointment_time = appointment_time_entry.get()
 
-                
                 # Check if the patient exists
                 cursor.execute("SELECT * FROM patient WHERE id = %s", (patient_id,))
                 patient = cursor.fetchone()
@@ -219,16 +226,18 @@ def show_receptionist_dashboard():
                     return
                 else:
                     # Check doctor's availability at the specified date and time
-                    cursor.execute("SELECT * FROM appointments WHERE doctor_id = %s AND appointment_date = %s AND appointment_time = %s",
-                                (doctor_id, appointment_date, appointment_time))
+                    cursor.execute(
+                        "SELECT * FROM appointments WHERE doctor_id = %s AND appointment_date = %s AND appointment_time = %s",
+                        (doctor_id, appointment_date, appointment_time))
                     existing_appointment = cursor.fetchone()
 
                     if existing_appointment:
-                        messagebox.showerror("Error", f"Doctor '{doctor_id}' is not available at the specified date and time.")
+                        messagebox.showerror("Error",
+                                             f"Doctor '{doctor_id}' is not available at the specified date and time.")
                         return
                     else:
                         query = "INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time) VALUES (%s, %s, %s, %s)"
-                        values = (patient_id, doctor_id, appointment_date, appointment_time)  
+                        values = (patient_id, doctor_id, appointment_date, appointment_time)
                         cursor.execute(query, values)
                         mysql.commit()
 
@@ -236,7 +245,7 @@ def show_receptionist_dashboard():
                         messagebox.showinfo("Success", "Appointment scheduled successfully.")
                         appointment_window.destroy()
                         appointment_scheduling(parent_window)
-                    
+
             def get_selected_date():
                 def on_date_select():
                     selected_date = cal.get_date()
@@ -261,7 +270,7 @@ def show_receptionist_dashboard():
                 def on_time_select():
                     selected_time = time_combobox.get()
                     if selected_time in available_time_slots:
-                        appointment_time_entry.insert(0,time_combobox.get())
+                        appointment_time_entry.insert(0, time_combobox.get())
                         available_time_slots.remove(selected_time)
                         time_combobox['values'] = available_time_slots
                         time_combobox.set((available_time_slots[0]) if available_time_slots else None)
@@ -282,9 +291,10 @@ def show_receptionist_dashboard():
 
                 select_button = ttk.Button(top, text="Select Time", command=on_time_select)
                 select_button.pack(pady=10)
-                    
+
             appointment_window = tk.Toplevel()
             appointment_window.title("Schedule Appointment")
+            appointment_window.geometry("200x250+500+250")
 
             # Create labels and entry fields for appointment details
             patient_id_label = tk.Label(appointment_window, text="Patient id:")
@@ -300,10 +310,9 @@ def show_receptionist_dashboard():
             # see a way to get date and time like using a calendar
             appointment_date_label = tk.Label(appointment_window, text="Appointment Date:")
             appointment_date_label.pack()
-            appointment_date_entry = tk.Entry(appointment_window) 
+            appointment_date_entry = tk.Entry(appointment_window)
             appointment_date_entry.pack()
             appointment_date_entry.bind("<Button-1>", lambda event: get_selected_date())
-
 
             appointment_time_label = tk.Label(appointment_window, text="Appointment Time:")
             appointment_time_label.pack()
@@ -313,18 +322,18 @@ def show_receptionist_dashboard():
 
             confirm_button = tk.Button(appointment_window, text="Confirm Appointment", command=confirm_appointment)
             confirm_button.pack()
-            
+
             back_button = tk.Button(appointment_window, text="Back", command=lambda: back(appointment_window))
             back_button.pack()
 
         def send_notification(patient_id, appointment_date, appointment_time):
             # Fetch patient's email from the database
             cursor.execute("SELECT email FROM patient WHERE id = %s", (patient_id,))
-            patient_email = cursor.fetchone()[0]  
-            
+            patient_email = cursor.fetchone()[0]
+
             # Email configuration
-            sender_email = 'appointments.cityhospital@gmail.com'  
-            password = 'llqi cfwt smqu eodp'  
+            sender_email = 'appointments.cityhospital@gmail.com'
+            password = 'llqi cfwt smqu eodp'
             subject = 'Appointment Confirmation'
             cursor.execute("SELECT name FROM patient WHERE id = %s", (patient_id,))
             patient_name = cursor.fetchone()[0]
@@ -334,7 +343,6 @@ def show_receptionist_dashboard():
             s.login(sender_email, password)
             s.sendmail(sender_email, patient_email, body)
             s.quit()
-            
 
         feature_window = tk.Toplevel()
         feature_window.title("Appointment Scheduling")
@@ -345,12 +353,14 @@ def show_receptionist_dashboard():
         show_appointments_button = tk.Button(feature_window, text="Show All Appointments", command=show_appointments)
         show_appointments_button.pack()
 
-        return_button = tk.Button(feature_window, text="Back to Main Menu", command=lambda: return_to_main_menu(feature_window))
+        return_button = tk.Button(feature_window, text="Back to Main Menu",
+                                  command=lambda: return_to_main_menu(feature_window))
         return_button.pack()
 
     def patient_information(parent_window):
         ''' Functionality for updating patient details'''
         receptionist_dashboard.withdraw()
+
         def back(window_to_close):
             window_to_close.destroy()
             patient_information(parent_window)
@@ -358,6 +368,7 @@ def show_receptionist_dashboard():
         def add_patient():
             '''Functionality to add a new patient'''
             feature_window.withdraw()
+
             def insert_patient():
                 name = name_entry.get()
                 age = age_entry.get()
@@ -371,7 +382,7 @@ def show_receptionist_dashboard():
 
                 # Insert the patient details into the database
                 insert_query = "INSERT INTO patient (name, age, sex, blood_group, email, contact, address, illness_injury, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                values = (name, age, sex, blood_group, email, contact, address, illness_injury, status)  
+                values = (name, age, sex, blood_group, email, contact, address, illness_injury, status)
 
                 cursor.execute(insert_query, values)
                 mysql.commit()
@@ -392,6 +403,7 @@ def show_receptionist_dashboard():
 
             add_patient_window = tk.Toplevel()
             add_patient_window.title("Add New Patient")
+            add_patient_window.geometry("150x700+500+250")
 
             # Create labels and entry fields for patient details
             name_label = ttk.Label(add_patient_window, text="Name:")
@@ -404,7 +416,7 @@ def show_receptionist_dashboard():
             age_entry = ttk.Entry(add_patient_window)
             age_entry.pack()
 
-            #make dropdown with values Male, Female, Other
+            # make dropdown with values Male, Female, Other
             sex_label = ttk.Label(add_patient_window, text="Sex:")
             sex_label.pack()
             sex_entry = ttk.Combobox(add_patient_window)
@@ -454,6 +466,7 @@ def show_receptionist_dashboard():
         def view_patients():
             '''Functionality to view patient records'''
             feature_window.withdraw()
+
             def insert_to_treeview(treeview, patients, columns):
                 # Insert data into the Treeview widget
                 for patient in patients:
@@ -488,9 +501,9 @@ def show_receptionist_dashboard():
 
             # Retrieve admitted patients
             admitted_query = "SELECT patient.id, patient.name, patient.age, patient.sex, patient.blood_group, " \
-                            "admitted.admit_date, admitted.discharged_date " \
-                            "FROM admitted " \
-                            "INNER JOIN patient ON admitted.patient_id = patient.id"
+                             "admitted.admit_date, admitted.discharged_date " \
+                             "FROM admitted " \
+                             "INNER JOIN patient ON admitted.patient_id = patient.id"
 
             # Retrieve all patients
             all_patients_query = "SELECT id, name, age, sex, blood_group, status FROM patient"
@@ -516,6 +529,7 @@ def show_receptionist_dashboard():
         def update_patient():
             '''Functionality for updating patient information'''
             feature_window.withdraw()
+
             def save_changes():
                 patient_id = patient_id_entry.get()
                 address = address_entry.get()
@@ -524,7 +538,7 @@ def show_receptionist_dashboard():
                 status = status_entry.get()
                 illness_injury = illness_injury_entry.get()
                 # Check if the entered patient ID is valid and exists in the database
-                if not patient_id : 
+                if not patient_id:
                     error_message = f"Empty values"
                     messagebox.showerror("Error", error_message)
                     return
@@ -537,8 +551,8 @@ def show_receptionist_dashboard():
                     error_message = f"Patient ID: {patient[0]} is not found in the database"
                     messagebox.showerror("Error", error_message)
                     return
-                
-                 # Create a list to store fields that need to be updated
+
+                # Create a list to store fields that need to be updated
                 update_fields = []
 
                 # Check each field and add it to the list if it's not empty
@@ -570,7 +584,7 @@ def show_receptionist_dashboard():
                     return
 
                 query = "UPDATE patient SET address = %s, contact = %s, email = %s, status = %s, illness_injury = %s WHERE id = %s"
-                values = (address, contact, email, status, illness_injury, patient_id) 
+                values = (address, contact, email, status, illness_injury, patient_id)
                 cursor.execute(query, values)
                 mysql.commit()
 
@@ -579,6 +593,7 @@ def show_receptionist_dashboard():
 
             update_window = tk.Toplevel()
             update_window.title("Update Patient Information")
+            update_window.geometry("150x600+500+250")
 
             # Create labels and entry fields for updating patient details
             patient_id_label = tk.Label(update_window, text="Patient ID:")
@@ -630,22 +645,27 @@ def show_receptionist_dashboard():
         update_button = tk.Button(feature_window, text="Update Patient Details", command=update_patient)
         update_button.pack()
 
-        return_button = tk.Button(feature_window, text="Back to Main Menu", command=lambda: return_to_main_menu(feature_window))
+        return_button = tk.Button(feature_window, text="Back to Main Menu",
+                                  command=lambda: return_to_main_menu(feature_window))
         return_button.pack()
 
     receptionist_dashboard = tk.Tk()
     receptionist_dashboard.title("Receptionist Dashboard")
+    receptionist_dashboard.geometry("300x100+500+250")
 
     main_menu = tk.Frame(receptionist_dashboard)
     main_menu.pack()
 
-    admit_discharge_button = tk.Button(main_menu, text="Admit/Discharge Management", command=lambda: admit_discharge_management(main_menu))
+    admit_discharge_button = tk.Button(main_menu, text="Admit/Discharge Management",
+                                       command=lambda: admit_discharge_management(main_menu))
     admit_discharge_button.pack()
 
-    appointment_button = tk.Button(main_menu, text="Appointment Scheduling", command=lambda: appointment_scheduling(main_menu))
+    appointment_button = tk.Button(main_menu, text="Appointment Scheduling",
+                                   command=lambda: appointment_scheduling(main_menu))
     appointment_button.pack()
 
-    update_info_button = tk.Button(main_menu, text="Patient Information", command=lambda: patient_information(main_menu))
+    update_info_button = tk.Button(main_menu, text="Patient Information",
+                                   command=lambda: patient_information(main_menu))
     update_info_button.pack()
 
     receptionist_dashboard.mainloop()

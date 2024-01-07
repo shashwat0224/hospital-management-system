@@ -198,14 +198,26 @@ def show_receptionist_dashboard():
                         messagebox.showinfo("Success", "Appointment scheduled successfully.")
                         appointment_window.destroy()
                         appointment_scheduling(parent_window)
+                        
+             def date_check(app_date):
+                app_date_ = app_date.split("/")[1]
+                app_month = app_date.split("/")[0]
+                app_year = app_date.split("/")[2]
+                current_date = str(datetime.now().date())
+                current_date_ = current_date.split("-")[2]
+                current_month = current_date.split("-")[1]
+                current_year = current_date.split("-")[0]
 
-            def date_check(event):
-                appointment_date = appointment_date_entry.get()
-                current_date = datetime.now().date()
-                # print(current_date)
-                if appointment_date < current_date:
-                    messagebox.showerror("Error", "Please select a future date for the appointment.")
-                    return
+                if app_date_ < current_date_ or app_month < current_month or app_year < current_year :
+                    messagebox.showerror("Error", "Enter date has already passed.")
+                    
+            # def date_check(event):
+            #     appointment_date = appointment_date_entry.get()
+            #     current_date = datetime.now().date()
+            #     # print(current_date)
+            #     if appointment_date < current_date:
+            #         messagebox.showerror("Error", "Please select a future date for the appointment.")
+            #         return
 
             def get_selected_time(selected_date):
                 def on_time_select():

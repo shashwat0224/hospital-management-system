@@ -158,9 +158,9 @@ def show_receptionist_dashboard():
         receptionist_dashboard.withdraw()
 
         available_time_slots = [
-            "09:00 AM", "10:00 AM", "11:00 AM",
-            "01:00 PM", "02:00 PM", "03:00 PM",
-            "04:00 PM", "05:00 PM", "06:00 PM"
+                "09:00", "10:00", "11:00",
+                "13:00", "14:00", "15:00",
+                "16:00", "17:00", "18:00"
         ]
 
         def back(window_to_close):

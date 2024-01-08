@@ -39,7 +39,7 @@ def show_admin_dashboard():
 
                     messagebox.showinfo("Success", "Staff added successfully.")
                     staff_add_window.destroy()
-                    back(manage_staff)
+                    back(staff_add_window)
 
                 else:
                     messagebox.showerror("Error", "Please fill in all required fields.")
@@ -830,7 +830,7 @@ def show_admin_dashboard():
                         messagebox.showwarning("Warning", "Please select a date from today onwards.")
                     else:
                         appointment_date_entry.delete(0, tk.END)
-                        appointment_date_entry.insert(0, selected_date)  # Updated date format
+                        appointment_date_entry.insert(0, str(selected_date))  # Updated date format
                         top.destroy()
 
                 top = tk.Toplevel(schedule_window)

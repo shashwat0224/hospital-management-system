@@ -841,10 +841,10 @@ def show_admin_dashboard():
                 select_button.pack(pady=10)
 
             available_time_slots = [
-                "09:00 AM", "10:00 AM", "11:00 AM",
-                "01:00 PM", "02:00 PM", "03:00 PM",
-                "04:00 PM", "05:00 PM", "06:00 PM"
-            ]
+                "09:00", "10:00", "11:00",
+                "13:00", "14:00", "15:00",
+                "16:00", "17:00", "18:00"]
+            
 
             def get_selected_time(selected_date):
                 def on_time_select():

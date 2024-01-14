@@ -5,10 +5,6 @@ from tkinter import messagebox, ttk
 from database import cursor, mysql
 import smtplib
 
-
-# from test import get_selected_date
-
-
 def show_receptionist_dashboard():
     def return_to_main_menu(window_to_close):
         window_to_close.destroy()
@@ -135,8 +131,7 @@ def show_receptionist_dashboard():
             discharge_button = tk.Button(patient_discharge_window, text="Discharge", command=discharge)
             discharge_button.pack()
 
-            back_button = tk.Button(patient_discharge_window, text="Back",
-                                    command=lambda: back(patient_discharge_window))
+            back_button = tk.Button(patient_discharge_window, text="Back",command=lambda: back(patient_discharge_window))
             back_button.pack()
 
         feature_window = tk.Toplevel()
@@ -149,19 +144,12 @@ def show_receptionist_dashboard():
         discharge_button = tk.Button(feature_window, text="Discharge Patient", command=discharge_patient)
         discharge_button.pack()
 
-        return_button = tk.Button(feature_window, text="Back to Main Menu",
-                                  command=lambda: return_to_main_menu(feature_window))
+        return_button = tk.Button(feature_window, text="Back to Main Menu",command=lambda: return_to_main_menu(feature_window))
         return_button.pack()
 
     def appointment_scheduling(parent_window):
         '''Functionality for scheduling patient appointments with doctors'''
         receptionist_dashboard.withdraw()
-
-        available_time_slots = [
-                "09:00", "10:00", "11:00",
-                "13:00", "14:00", "15:00",
-                "16:00", "17:00", "18:00"
-        ]
 
         def back(window_to_close):
             window_to_close.destroy()
@@ -266,6 +254,11 @@ def show_receptionist_dashboard():
                 select_button = ttk.Button(top, text="Select Date", command=on_date_select)
                 select_button.pack(pady=10)
 
+            available_time_slots = [
+                    "09:00", "10:00", "11:00",
+                    "13:00", "14:00", "15:00",
+                    "16:00", "17:00", "18:00"
+            ]
             def get_selected_time(selected_date):
                 def on_time_select():
                     selected_time = time_combobox.get()
@@ -308,13 +301,13 @@ def show_receptionist_dashboard():
             doctor_id_entry.pack()
 
             # see a way to get date and time like using a calendar
-            appointment_date_label = tk.Label(appointment_window, text="Appointment Date:")
+            appointment_date_label = tk.Label(appointment_window, text="Appointment Date (YYYY-MM-DD):")
             appointment_date_label.pack()
             appointment_date_entry = tk.Entry(appointment_window)
             appointment_date_entry.pack()
             appointment_date_entry.bind("<Button-1>", lambda event: get_selected_date())
 
-            appointment_time_label = tk.Label(appointment_window, text="Appointment Time:")
+            appointment_time_label = tk.Label(appointment_window, text="Appointment Time (HH:MM 24hr Clock):")
             appointment_time_label.pack()
             appointment_time_entry = tk.Entry(appointment_window)
             appointment_time_entry.pack()
@@ -353,8 +346,7 @@ def show_receptionist_dashboard():
         show_appointments_button = tk.Button(feature_window, text="Show All Appointments", command=show_appointments)
         show_appointments_button.pack()
 
-        return_button = tk.Button(feature_window, text="Back to Main Menu",
-                                  command=lambda: return_to_main_menu(feature_window))
+        return_button = tk.Button(feature_window, text="Back to Main Menu",command=lambda: return_to_main_menu(feature_window))
         return_button.pack()
 
     def patient_information(parent_window):
@@ -419,14 +411,14 @@ def show_receptionist_dashboard():
             # make dropdown with values Male, Female, Other
             sex_label = ttk.Label(add_patient_window, text="Sex:")
             sex_label.pack()
-            sex_entry = ttk.Combobox(add_patient_window)
+            sex_entry = ttk.Combobox(add_patient_window, state="readonly")
             sex_entry["values"] = ("Male", "Female", "Other")
             sex_entry.pack()
 
             # make dropdown with values A+, B+, O+, AB+, A-, B-, O-, AB-
             blood_group_label = tk.Label(add_patient_window, text="Blood Group:")
             blood_group_label.pack()
-            blood_group_entry = ttk.Combobox(add_patient_window)
+            blood_group_entry = ttk.Combobox(add_patient_window, state="readonly")
             blood_group_entry['values'] = ("A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-")
             blood_group_entry.pack()
 
@@ -453,7 +445,7 @@ def show_receptionist_dashboard():
             # dropdown with values inpatient, outpatient
             status_label = tk.Label(add_patient_window, text="Status:")
             status_label.pack()
-            status_entry = ttk.Combobox(add_patient_window)
+            status_entry = ttk.Combobox(add_patient_window, state="readonly")
             status_entry['values'] = ("inpatient", "outpatient")
             status_entry.pack()
 
@@ -624,7 +616,8 @@ def show_receptionist_dashboard():
             # make dropdown with values -> inpatient and outpatient
             status_label = tk.Label(update_window, text="Status:")
             status_label.pack()
-            status_entry = tk.Entry(update_window)
+            status_entry = ttk.Combobox(update_window, state="readonly")
+            status_entry['values'] = ("inpatient", "outpatient")
             status_entry.pack()
 
             save_button = tk.Button(update_window, text="Save Changes", command=save_changes)

@@ -10,7 +10,9 @@ if mysql.is_connected():
 
 cursor = mysql.cursor()
 
-# cursor.execute('''CREATE TABLE patient (
+# cursor.execute('CREATE DATABASE IF NOT EXISTS hospital;')
+
+# cursor.execute('''CREATE TABLE IF NOT EXISTS patient (
 #     id INT AUTO_INCREMENT PRIMARY KEY,
 #     name VARCHAR(100),
 #     age INT,
@@ -24,7 +26,7 @@ cursor = mysql.cursor()
 # );
 # ''')
 
-# cursor.execute('''CREATE TABLE doctor (
+# cursor.execute('''CREATE TABLE IF NOT EXISTS doctor (
 #     id INT AUTO_INCREMENT PRIMARY KEY,
 #     name VARCHAR(100),
 #     specialization VARCHAR(100),
@@ -34,7 +36,7 @@ cursor = mysql.cursor()
 #     email VARCHAR(100)
 # );
 # ''')
-# cursor.execute('''CREATE TABLE staff (
+# cursor.execute('''CREATE TABLE IF NOT EXISTS staff (
 #     id INT AUTO_INCREMENT PRIMARY KEY,
 #     name VARCHAR(100),
 #     job_title VARCHAR(100),
@@ -43,7 +45,7 @@ cursor = mysql.cursor()
 #     email VARCHAR(100)
 # );
 # ''')
-# cursor.execute('''CREATE TABLE admitted (
+# cursor.execute('''CREATE TABLE IF NOT EXISTS admitted (
 #     id INT AUTO_INCREMENT PRIMARY KEY,
 #     patient_id INT,
 #     doctor_id INT,
@@ -53,7 +55,7 @@ cursor = mysql.cursor()
 #     FOREIGN KEY (doctor_id) REFERENCES doctor(id)
 # );
 # ''')
-# cursor.execute('''CREATE TABLE appointments (
+# cursor.execute('''CREATE TABLE IF NOT EXISTS appointments (
 #     id INT AUTO_INCREMENT PRIMARY KEY,
 #     patient_id INT,
 #     doctor_id INT,
@@ -68,6 +70,7 @@ cursor = mysql.cursor()
 # cursor.execute("ALTER TABLE staff AUTO_INCREMENT = 346000;")
 # cursor.execute("ALTER TABLE doctor AUTO_INCREMENT = 157000;")
 # cursor.execute("ALTER TABLE patient AUTO_INCREMENT = 736090;")
+
 
 # cursor.execute('''INSERT INTO staff (name, job_title, contact, address, email)
 # VALUES
@@ -109,12 +112,4 @@ cursor = mysql.cursor()
 #     (736091, 157001, '2024-01-05 10:30:00', '2024-01-10 16:00:00');
 # ''')
 
-# mysql.commit()
-
-# print("commited")
-# patient_id = "736090"
-# query = f"SELECT discharged_date FROM admitted WHERE patient_id = {patient_id};"
-# cursor.execute(query)
-# patient = cursor.fetchone()
-# if patient[0] is not None:
-#     print(patient)  
+# mysql.commit() 

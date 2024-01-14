@@ -6,7 +6,6 @@ from datetime import datetime
 from database import cursor, mysql
 from tkcalendar import Calendar
 
-
 def show_admin_dashboard():
     def return_to_main_menu(window_to_close):
         window_to_close.destroy()
@@ -318,14 +317,14 @@ def show_admin_dashboard():
             # make dropdown with values Male, Female, Other
             sex_label = ttk.Label(add_patient_window, text="Sex:")
             sex_label.pack()
-            sex_entry = ttk.Combobox(add_patient_window)
+            sex_entry = ttk.Combobox(add_patient_window, state="readonly")
             sex_entry["values"] = ("Male", "Female", "Other")
             sex_entry.pack()
 
             # make dropdown with values A+, B+, O+, AB+, A-, B-, O-, AB-
             blood_group_label = tk.Label(add_patient_window, text="Blood Group:")
             blood_group_label.pack()
-            blood_group_entry = ttk.Combobox(add_patient_window)
+            blood_group_entry = ttk.Combobox(add_patient_window, state="readonly")
             blood_group_entry['values'] = ("A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-")
             blood_group_entry.pack()
 
@@ -352,7 +351,7 @@ def show_admin_dashboard():
             # dropdown with values inpatient, outpatient
             status_label = tk.Label(add_patient_window, text="Status:")
             status_label.pack()
-            status_entry = ttk.Combobox(add_patient_window)
+            status_entry = ttk.Combobox(add_patient_window, state="readonly")
             status_entry['values'] = ("inpatient", "outpatient")
             status_entry.pack()
 
@@ -491,7 +490,8 @@ def show_admin_dashboard():
             # make dropdown with values -> inpatient and outpatient
             status_label = tk.Label(update_window, text="Status:")
             status_label.pack()
-            status_entry = tk.Entry(update_window)
+            status_entry = ttk.Combobox(update_window, state="readonly")
+            status_entry['values'] = ("inpatient", "outpatient")
             status_entry.pack()
 
             save_button = tk.Button(update_window, text="Save Changes", command=save_changes)

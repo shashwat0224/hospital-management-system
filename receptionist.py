@@ -54,8 +54,7 @@ def show_receptionist_dashboard():
                 cursor.execute(query)
                 mysql.commit()
 
-                messagebox.showinfo("Success",
-                                    f"Patient '{name}' admitted successfully under supervision of '{doctor[0]}'.")
+                messagebox.showinfo("Success",f"Patient '{name}' admitted successfully under supervision of '{doctor[0]}'.")
                 patient_admit_window.destroy()
 
             patient_admit_window = tk.Toplevel()
@@ -104,7 +103,7 @@ def show_receptionist_dashboard():
                     error_message = f"Patient ID: {patient[0]} is not found in the database"
                     messagebox.showerror("Error", error_message)
                     return
-                query = f"SELECT discharged_date FROM admitted WHERE patient_id = {patient_id};"
+                query = f"SELECT admit_date FROM admitted WHERE patient_id = {patient_id};"
                 cursor.execute(query)
                 patient = cursor.fetchone()
                 if patient[0] is None:

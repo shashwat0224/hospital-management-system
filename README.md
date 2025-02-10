@@ -91,5 +91,5 @@ This project is **licensed under the [MIT License](LICENSE)** – feel free to u
 ## 👨‍💻 Developers  
 
 Developed by:  
-- **Shashwat Baheti**  
-- **Anshul Bhau**  
+- **[Shashwat Baheti](https://github.com/shashwat0224)**  
+- **[Anshul Bhau](https://github.com/Anshul-Bhau)**  

@@ -44,7 +44,7 @@ cd hospital-management-system
 ###  Install Dependencies  
 Ensure you have Python installed, then run:  
 ```bash
-pip install -r requirements.txt
+pip install mysql-connector-python tkcalendar matplotlib
 ```
 
 ###  Set Up the Database  
@@ -55,7 +55,14 @@ python database.py
 ```
 
 ###  Configure Email Notifications  
-- Set up **email server settings** in `config.py`.  
+- Set up **email server settings** in `admin.py` and `receptionist.py` before running the app.
+- Enter the desired email address from which you want to send mail in `sender_email = 'email@example.com'` . and email id's passkey in `password = 'email-passkey'`.
+- You will find the following code:
+```python
+sender_email = 'email@example.com'
+            password = 'email-passkey'
+```
+In `admin.py` at line 915 and in `receptionist.py` at line 327
 - Ensure that the application has access to send emails through your specified server.
 
 ###  Run the Application  

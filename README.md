@@ -4,7 +4,6 @@
 
 The **Hospital Management System** is a **user-friendly, efficient, and secure** system designed to streamline hospital operations. Built using **Python and MySQL**, this system **automates patient management, appointment scheduling, and staff administration**, ensuring seamless workflow and better healthcare service delivery.
 
----
 
 ##  Key Features
 
@@ -33,7 +32,6 @@ The **Hospital Management System** is a **user-friendly, efficient, and secure**
 - **Database backup & recovery** mechanisms.
 - **Optimized queries for fast performance**.
 
----
 
 ##  Installation Guide
 
@@ -65,7 +63,6 @@ python database.py
 python main.py
 ```
 
----
 
 ##  How It Works  
 
@@ -75,7 +72,6 @@ python main.py
 - **Email Notifications** → Automatically notify patients and staff about appointments and updates.  
 - **View Reports & Records** → Analyze hospital data effortlessly.  
 
----
 
 ##  Contributing  
 
@@ -86,13 +82,11 @@ Want to improve this project? Follow these steps:
 3. **Commit & push** your changes.  
 4. **Submit** a pull request!  
 
----
 
 ##  License  
 
 This project is **licensed under the MIT License** – feel free to use and modify it!  
 
----
 
 ## 👨‍💻 Developers  
 

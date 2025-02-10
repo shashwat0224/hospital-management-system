@@ -44,7 +44,7 @@ cd hospital-management-system
 ###  Install Dependencies  
 Ensure you have Python installed, then run:  
 ```bash
-pip install -r requirements.txt
+pip install mysql-connector-python tkcalender matplotlib
 ```
 
 ###  Set Up the Database  
